@@ -1,21 +1,17 @@
 {
-  "name": "nfl-rushing-test",
+  "name": "graphql-nfl-rushing-test",
   "version": "1.0.0",
-  "description": "take home test for theScore",
+  "description": "graphql server for nfl rushing test",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JosieRice/nfl-rusing-test.git"
+    "url": "git+https://github.com/JosieRice/nfl-rushing-test.git"
   },
   "author": "Josie Rice",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JosieRice/nfl-rusing-test/issues"
-  },
-  "homepage": "https://github.com/JosieRice/nfl-rusing-test#readme",
   "dependencies": {
     "express": "^4.17.2",
     "express-graphql": "^0.12.0",
