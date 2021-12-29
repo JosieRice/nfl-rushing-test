@@ -55,3 +55,8 @@ If you have any questions regarding requirements, do not hesitate to email your 
 
 ### Installation and running this solution
 ... TODO
+
+https://graphql.org/graphql-js/
+https://www.section.io/engineering-education/build-and-dockerize-a-full-stack-react-app-with-nodejs-and-nginx/
+https://docs.microsoft.com/en-us/learn/modules/intro-to-containers/2-deploy-docker-image-locally
+https://dev.to/ajcwebdev/how-to-deploy-a-graphql-server-with-docker-and-fly-1e8b
