@@ -54,9 +54,6 @@ We will evaluate you on your ability to solve the problem defined in the require
 If you have any questions regarding requirements, do not hesitate to email your contact at theScore for clarification.
 
 ### Installation and running this solution
-... TODO
-
-https://graphql.org/graphql-js/
-https://www.section.io/engineering-education/build-and-dockerize-a-full-stack-react-app-with-nodejs-and-nginx/
-https://docs.microsoft.com/en-us/learn/modules/intro-to-containers/2-deploy-docker-image-locally
-https://dev.to/ajcwebdev/how-to-deploy-a-graphql-server-with-docker-and-fly-1e8b
+1. clone repo
+2. open repo folder
+3. start graphql container with command `docker compose up -d` (make sure it's running at http://localhost:8080/graphql)

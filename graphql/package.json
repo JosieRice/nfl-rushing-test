@@ -2,7 +2,7 @@
   "name": "nfl-rushing-test",
   "version": "1.0.0",
   "description": "take home test for theScore",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +20,8 @@
     "express": "^4.17.2",
     "express-graphql": "^0.12.0",
     "graphql": "^16.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.5"
   }
 }
