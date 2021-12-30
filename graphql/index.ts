@@ -4,7 +4,7 @@ const { buildSchema } = require("graphql");
 const rushingStats = require("./rushing.json");
 
 const schema = buildSchema(`
-  type RushingStats {
+  type RushingStats  {
     player: String!
     team: String!
     pos: String!
@@ -24,7 +24,7 @@ const schema = buildSchema(`
 
   type Query {
     totalCount: Int!
-    rushingStats: [RushingStats]
+    rushingStats(numPerPage: Int pgNum:Int): [RushingStats]
   }
 `);
 
@@ -33,7 +33,12 @@ const rootValue = {
     return rushingStats.length;
   },
 
-  rushingStats: () => {
+  /**
+   * this is a naive implementation because I always have all of the rushingStats to sort and paginate
+   * the args provided would be enough to get a limit on a sql query and query specific data, which would be the scalable solution
+   * I'm choosing to not go through setting up a sql db in a container and migrate the data though, because I'm applying for a frontend job and it feels like putting effort in the wrong direction
+   */
+  rushingStats: (args) => {
     const sanitizedRushingStats = rushingStats.map((stat) => {
       let sanitizedStat = { ...stat };
 
@@ -72,7 +77,10 @@ const rootValue = {
       return sanitizedStat;
     });
 
-    return sanitizedRushingStats;
+    const startingIndex = (args.pgNum - 1) * args.numPerPage;
+    const endingIndex = startingIndex + args.numPerPage;
+
+    return sanitizedRushingStats.slice(startingIndex, endingIndex);
   },
 };
 
