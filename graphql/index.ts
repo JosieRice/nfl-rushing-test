@@ -5,40 +5,56 @@ const rushingStats = require("./rushing.json");
 
 const schema = buildSchema(`
   type RushingStats {
-    Player: String!
-    Team: String!
-    Pos: String!
-    Att: Int!
-    Att_G: Float!
-    Yds: Float!
-    Avg: Float!
-    Yds_G: Float!
-    TD: Int!
-    Lng: String!
-    First: Int!
-    First_Percent: Float!
-    Twenty_Plus: Int!
-    Fourty_Plus: Int!
-    FUM: Int!
+    player: String!
+    team: String!
+    pos: String!
+    att: Int!
+    attPerGame: Float!
+    yds: Float!
+    avg: Float!
+    ydsPerGame: Float!
+    touchDown: Int!
+    longest: String!
+    first: Int!
+    firstPercent: Float!
+    twentyPlus: Int!
+    fourtyPlus: Int!
+    fumble: Int!
   }
 
   type Query {
+    totalCount: Int!
     rushingStats: [RushingStats]
   }
 `);
 
 const rootValue = {
+  totalCount: () => {
+    return rushingStats.length;
+  },
+
   rushingStats: () => {
     const sanitizedRushingStats = rushingStats.map((stat) => {
       let sanitizedStat = { ...stat };
 
-      /** graphql schema doesn't support some of the characters in the keys provided, so this is linking them back up for the graphql response */
-      sanitizedStat.Att_G = stat["Att/G"];
-      sanitizedStat.Yds_G = stat["Yds/G"];
-      sanitizedStat.First = stat["1st"];
-      sanitizedStat.First_Percent = stat["1st%"];
-      sanitizedStat.Twenty_Plus = stat["20+"];
-      sanitizedStat.Fourty_Plus = stat["40+"];
+      /**
+       * graphql schema doesn't support some of the characters in the keys provided, so this is linking them back up for the graphql response
+       * javascript code is usually in camelcase, so I'm using this resolver to rename some keys since React will be consuming this API
+       */
+      sanitizedStat.player = stat.Player;
+      sanitizedStat.team = stat.Team;
+      sanitizedStat.pos = stat.Pos;
+      sanitizedStat.att = stat.Att;
+      sanitizedStat.attPerGame = stat["Att/G"];
+      sanitizedStat.avg = stat.Avg;
+      sanitizedStat.ydsPerGame = stat["Yds/G"];
+      sanitizedStat.touchDown = stat.TD;
+      sanitizedStat.longest = stat.Lng;
+      sanitizedStat.first = stat["1st"];
+      sanitizedStat.firstPercent = stat["1st%"];
+      sanitizedStat.twentyPlus = stat["20+"];
+      sanitizedStat.fourtyPlus = stat["40+"];
+      sanitizedStat.fumble = stat.FUM;
 
       /**
        * changing all Yds into floating point integers and removing the commas as needed
@@ -48,7 +64,9 @@ const rootValue = {
        */
       if (typeof stat.Yds === "string") {
         const yrdsToNumber = parseFloat(stat.Yds.replace(/,/g, ""));
-        sanitizedStat.Yds = yrdsToNumber;
+        sanitizedStat.yds = yrdsToNumber;
+      } else {
+        sanitizedStat.yds = stat.Yds;
       }
 
       return sanitizedStat;
