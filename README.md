@@ -55,5 +55,7 @@ If you have any questions regarding requirements, do not hesitate to email your 
 
 ### Installation and running this solution
 1. clone repo
-2. open repo folder
-3. start graphql container with command `docker compose up -d` (make sure it's running at http://localhost:8080/graphql)
+2. open repo folder at root
+3. start developement containers with command `docker compose up -d` 
+    - graphql http://localhost:8080/graphql
+    - website http://localhost:3000
