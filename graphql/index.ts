@@ -1,44 +1,95 @@
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const { buildSchema } = require("graphql");
+/** NOTE: should be migrated to a db, but I'm Frontend, so I'm just leaving as is */
 const rushingStats = require("./rushing.json");
 
 const schema = buildSchema(`
-  type RushingStats {
-    Player: String!
-    Team: String!
-    Pos: String!
-    Att: Int!
-    Att_G: Float!
-    Yds: Float!
-    Avg: Float!
-    Yds_G: Float!
-    TD: Int!
-    Lng: String!
-    First: Int!
-    First_Percent: Float!
-    Twenty_Plus: Int!
-    Fourty_Plus: Int!
-    FUM: Int!
+  enum SortBy {
+    yds
+    touchDown
+    longest
+  }
+
+  enum OrderBy {
+    asc
+    desc
+  }
+
+  type RushingStats  {
+    player: String!
+    team: String!
+    pos: String!
+    att: Int!
+    attPerGame: Float!
+    yds: Float!
+    avg: Float!
+    ydsPerGame: Float!
+    touchDown: Int!
+    longest: String!
+    first: Int!
+    firstPercent: Float!
+    twentyPlus: Int!
+    fourtyPlus: Int!
+    fumble: Int!
   }
 
   type Query {
-    rushingStats: [RushingStats]
+    totalCount: Int!
+    rushingStats(
+      numPerPage: Int!
+      pgNum:Int!
+      filter: String
+      sortBy: SortBy
+      orderBy: OrderBy
+    ): [RushingStats]
   }
 `);
 
 const rootValue = {
-  rushingStats: () => {
-    const sanitizedRushingStats = rushingStats.map((stat) => {
+  totalCount: () => {
+    return rushingStats.length;
+  },
+
+  rushingStats: (args) => {
+    /**
+     * filter logic
+     * NOTE: this should be part of a db query - but I'm Frontend, so I'm just cheating it
+     */
+    let filteredStats = rushingStats;
+    if (args.filter) {
+      filteredStats = rushingStats.map((stat) => {
+        const player = stat.Player;
+        if (player.includes(args.filter)) {
+          return stat;
+        } else {
+          return null;
+        }
+      });
+    }
+    const filteredStatsClean = filteredStats.filter(Boolean);
+
+    /**
+     * graphql schema doesn't support some of the characters in the keys provided, so this is linking them back up for the graphql response
+     * javascript code is usually in camelcase, so I'm using this resolver to rename some keys since React will be consuming this API
+     */
+    const renamedStats = filteredStatsClean.map((stat) => {
       let sanitizedStat = { ...stat };
 
-      /** graphql schema doesn't support some of the characters in the keys provided, so this is linking them back up for the graphql response */
-      sanitizedStat.Att_G = stat["Att/G"];
-      sanitizedStat.Yds_G = stat["Yds/G"];
-      sanitizedStat.First = stat["1st"];
-      sanitizedStat.First_Percent = stat["1st%"];
-      sanitizedStat.Twenty_Plus = stat["20+"];
-      sanitizedStat.Fourty_Plus = stat["40+"];
+      sanitizedStat.player = stat.Player;
+      sanitizedStat.team = stat.Team;
+      sanitizedStat.pos = stat.Pos;
+      sanitizedStat.att = stat.Att;
+      sanitizedStat.attPerGame = stat["Att/G"];
+      sanitizedStat.avg = stat.Avg;
+      sanitizedStat.ydsPerGame = stat["Yds/G"];
+      sanitizedStat.touchDown = stat.TD;
+      sanitizedStat.longest = stat.Lng;
+      sanitizedStat.first = stat["1st"];
+      sanitizedStat.firstPercent = stat["1st%"];
+      sanitizedStat.twentyPlus = stat["20+"];
+      sanitizedStat.fourtyPlus = stat["40+"];
+      sanitizedStat.fumble = stat.FUM;
 
       /**
        * changing all Yds into floating point integers and removing the commas as needed
@@ -48,13 +99,53 @@ const rootValue = {
        */
       if (typeof stat.Yds === "string") {
         const yrdsToNumber = parseFloat(stat.Yds.replace(/,/g, ""));
-        sanitizedStat.Yds = yrdsToNumber;
+        sanitizedStat.yds = yrdsToNumber;
+      } else {
+        sanitizedStat.yds = stat.Yds;
       }
 
       return sanitizedStat;
     });
 
-    return sanitizedRushingStats;
+    /**
+     * sort logic
+     * NOTE: yet again, this should be part of the db query to return the correct info, but I'm Frontend so I'm going to forego doing it
+     */
+    let sortedStats = renamedStats;
+    if (args.sortBy && args.orderBy) {
+      const longestAsc = args.sortBy === "longest" && args.orderBy === "asc";
+      const longestDesc = args.sortBy === "longest" && args.orderBy === "desc";
+      const touchDownAsc =
+        args.sortBy === "touchDown" && args.orderBy === "asc";
+      const touchDownDesc =
+        args.sortBy === "touchDown" && args.orderBy === "desc";
+      const ydsAsc = args.sortBy === "yds" && args.orderBy === "asc";
+      const ydsDesc = args.sortBy === "yds" && args.orderBy === "desc";
+
+      if (longestAsc) {
+        sortedStats.sort((a, b) => a.longest - b.longest);
+      } else if (longestDesc) {
+        sortedStats.sort((a, b) => b.longest - a.longest);
+      } else if (touchDownAsc) {
+        sortedStats.sort((a, b) => a.touchDown - b.touchDown);
+      } else if (touchDownDesc) {
+        sortedStats.sort((a, b) => b.touchDown - a.touchDown);
+      } else if (ydsAsc) {
+        sortedStats.sort((a, b) => a.yds - b.yds);
+      } else if (ydsDesc) {
+        sortedStats.sort((a, b) => b.yds - a.yds);
+      }
+    }
+
+    /**
+     * pagination logic
+     * NOTE: should be a db query with a limit to allow for scaling up data - but I'm Frontend, so I'm just cheating it
+     */
+    const startingIndex = (args.pgNum - 1) * args.numPerPage;
+    const endingIndex = startingIndex + args.numPerPage;
+    let paginatedStats = sortedStats.slice(startingIndex, endingIndex);
+
+    return paginatedStats;
   },
 };
 
