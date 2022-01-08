@@ -1,6 +1,13 @@
 version: "1.0"
 services:
   graphql:
-    build: .
+    build: ./graphql
     ports:
       - "8080:8080"
+  web:
+    build: ./web
+    volumes:
+      - /app/node_modules
+      - ./web:/app
+    ports:
+      - "3000:3000"

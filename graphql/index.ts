@@ -3,6 +3,7 @@ const { graphqlHTTP } = require("express-graphql");
 const { buildSchema } = require("graphql");
 /** NOTE: should be migrated to a db, but I'm Frontend, so I'm just leaving as is */
 const rushingStats = require("./rushing.json");
+const cors = require("cors");
 
 const schema = buildSchema(`
   enum SortBy {
@@ -150,6 +151,9 @@ const rootValue = {
 };
 
 const app = express();
+
+/** NOTE: enabling all CORS requests because everything is just local development right now */
+app.use(cors());
 
 app.use(
   "/graphql",
