@@ -1,16 +1,32 @@
-import { useState } from "react";
 import { stripTypenames } from "../utils/utils";
 
 interface Props {
+  numPerPg: 10 | 25 | 50;
+  pgNum: number;
+  setNumPerPg: (arg0: 10 | 25 | 50) => void;
+  setPgNum: (arg0: number) => void;
   tableData: Record<string, number | string>[];
+  totalCount: number;
 }
 
-const Table = ({ tableData }: Props) => {
-  const [page, setPage] = useState(1);
-  const [numPerPage, setNumPerPage] = useState(10);
+const Table = ({
+  numPerPg,
+  pgNum,
+  setNumPerPg,
+  setPgNum,
+  tableData,
+  totalCount,
+}: Props) => {
+  /** wait to render until data exists */
+  const missingData = !tableData || !totalCount || tableData.length === 0;
+  if (missingData) return <></>;
 
-  if (!tableData) return <></>;
+  /** remove unwanted graphql noise */
   const sanitizedData = stripTypenames(tableData);
+
+  /** pagination stuff */
+  const pages = Math.ceil(totalCount / numPerPg);
+  const pagesArr = Array.from({ length: pages });
 
   return (
     <>
@@ -34,8 +50,37 @@ const Table = ({ tableData }: Props) => {
           })}
         </tbody>
       </table>
-      <div>page {page}</div>
-      <div>number per page {numPerPage}</div>
+
+      {/* pagination (pages) */}
+      <div>
+        page
+        {pagesArr.map((p, i) => {
+          const page = i + 1;
+          return (
+            <button
+              disabled={pgNum === page}
+              key={i}
+              onClick={() => setPgNum(page)}
+            >
+              {page}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* pagination (num per page) */}
+      <button disabled={numPerPg === 10} onClick={() => setNumPerPg(10)}>
+        10
+      </button>
+      <button disabled={numPerPg === 25} onClick={() => setNumPerPg(25)}>
+        25
+      </button>
+      <button disabled={numPerPg === 50} onClick={() => setNumPerPg(50)}>
+        50
+      </button>
+
+      {/* table metadata */}
+      <div>Total Results: {totalCount}</div>
     </>
   );
 };

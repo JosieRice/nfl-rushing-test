@@ -1,14 +1,7 @@
-import Index from "./rushingStatsTable/Index";
+import RushingStatsTable from "./rushingStatsTable/Index";
 
 const App = () => {
-  return (
-    <div>
-      <header>
-        <p>Basic React component rendering</p>
-      </header>
-      <Index />
-    </div>
-  );
+  return <RushingStatsTable />;
 };
 
 export default App;
