@@ -56,6 +56,12 @@ If you have any questions regarding requirements, do not hesitate to email your 
 ### Installation and running this solution
 1. clone repo
 2. open repo folder at root
-3. start developement containers with command `docker compose up -d` 
+3. start developement containers with command `docker compose up -d` (not working together yet)
     - graphql http://localhost:8080/graphql
     - website http://localhost:3000
+
+4. the work around until I get the docker containers linked:
+    - `cd graphql`
+    - `node index.ts`
+    - `cd web`
+    - `npm run start`

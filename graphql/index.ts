@@ -39,7 +39,7 @@ const schema = buildSchema(`
     totalCount: Int!
     rushingStats(
       numPerPage: Int!
-      pgNum:Int!
+      pgNum: Int!
       filter: String
       sortBy: SortBy
       orderBy: OrderBy
