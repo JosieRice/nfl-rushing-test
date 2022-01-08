@@ -38,7 +38,7 @@ const schema = buildSchema(`
   type Query {
     totalCount: Int!
     rushingStats(
-      numPerPage: Int!
+      numPerPg: Int!
       pgNum: Int!
       filter: String
       sortBy: SortBy
@@ -142,8 +142,8 @@ const rootValue = {
      * pagination logic
      * NOTE: should be a db query with a limit to allow for scaling up data - but I'm Frontend, so I'm just cheating it
      */
-    const startingIndex = (args.pgNum - 1) * args.numPerPage;
-    const endingIndex = startingIndex + args.numPerPage;
+    const startingIndex = (args.pgNum - 1) * args.numPerPg;
+    const endingIndex = startingIndex + args.numPerPg;
     let paginatedStats = sortedStats.slice(startingIndex, endingIndex);
 
     return paginatedStats;
