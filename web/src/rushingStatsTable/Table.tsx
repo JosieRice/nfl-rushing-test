@@ -1,4 +1,5 @@
 import { stripTypenames } from "../utils/utils";
+import { cleanHeaderNames } from "./data";
 
 interface Props {
   numPerPg: 10 | 25 | 50;
@@ -34,7 +35,7 @@ const Table = ({
         <thead>
           <tr>
             {Object.keys(sanitizedData[0]).map((value) => {
-              return <th key={value}>{value}</th>;
+              return <th key={value}>{cleanHeaderNames[value] ?? value}</th>;
             })}
           </tr>
         </thead>

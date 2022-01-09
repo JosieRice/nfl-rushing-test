@@ -13,11 +13,13 @@ const Index = () => {
   });
 
   /**
-   * if numPerPage changes, we want to go back to pg 1
+   * some times we want to jump back to pg 1 automatically:
+   * if numPerPage changes
+   * if filter is applied
    */
   useEffect(() => {
     setPgNum(1);
-  }, [numPerPg]);
+  }, [numPerPg, playerFilter]);
 
   return (
     <>

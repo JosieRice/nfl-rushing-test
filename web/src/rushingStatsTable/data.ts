@@ -1,0 +1,17 @@
+export const cleanHeaderNames: Record<string, string> = {
+  player: "Player",
+  team: "Team",
+  pos: "Position",
+  att: "Rusing Attempts",
+  attPerGame: "Rushing Attempts Per Game",
+  yds: "Total Rushing Yards",
+  avg: "Average Rusing Yards Per Attempt",
+  ydsPerGame: "Rushing Yards Per Game",
+  touchDown: "Total Rushing Touchdowns",
+  longest: "Longest Rush",
+  first: "Rushing First Downs",
+  firstPercent: "Rushing First Downs %",
+  twentyPlus: "Rushing 20+ Yards Each",
+  fourtyPlus: "Rushing 40+ Yards Each",
+  fumble: "Rushing Fumbles",
+};
