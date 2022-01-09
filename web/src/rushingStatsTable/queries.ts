@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
 export const RUSHING_STATS = gql`
-  query RushingStats ($pgNum: Int!, $numPerPg: Int!) {
-    totalCount
-    rushingStats(pgNum: $pgNum, numPerPg: $numPerPg) {
+  query RushingStats($pgNum: Int!, $numPerPg: Int!, $filter: String!) {
+    totalCount(filter: $filter)
+    rushingStats(pgNum: $pgNum, numPerPg: $numPerPg, filter: $filter) {
       player
       team
       pos

@@ -36,7 +36,7 @@ const schema = buildSchema(`
   }
 
   type Query {
-    totalCount: Int!
+    totalCount(filter: String!): Int!
     rushingStats(
       numPerPg: Int!
       pgNum: Int!
@@ -48,8 +48,20 @@ const schema = buildSchema(`
 `);
 
 const rootValue = {
-  totalCount: () => {
-    return rushingStats.length;
+  totalCount: (args) => {
+    let filteredStats = rushingStats;
+    if (args.filter) {
+      filteredStats = rushingStats.map((stat) => {
+        const player = stat?.Player?.toLowerCase();
+        if (player.includes(args?.filter?.toLowerCase())) {
+          return stat;
+        } else {
+          return null;
+        }
+      });
+    }
+    const filteredStatsClean = filteredStats.filter(Boolean);
+    return filteredStatsClean.length;
   },
 
   rushingStats: (args) => {
@@ -60,8 +72,8 @@ const rootValue = {
     let filteredStats = rushingStats;
     if (args.filter) {
       filteredStats = rushingStats.map((stat) => {
-        const player = stat.Player;
-        if (player.includes(args.filter)) {
+        const player = stat?.Player?.toLowerCase();
+        if (player.includes(args?.filter?.toLowerCase())) {
           return stat;
         } else {
           return null;
