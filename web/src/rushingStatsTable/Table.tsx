@@ -27,7 +27,6 @@ const Table = ({
 
   /** pagination stuff */
   const pages = Math.ceil(totalCount / numPerPg);
-  const pagesArr = Array.from({ length: pages });
 
   return (
     <>
@@ -54,19 +53,38 @@ const Table = ({
 
       {/* pagination (pages) */}
       <div>
-        page
-        {pagesArr.map((p, i) => {
+        <button
+          disabled={pgNum === 1}
+          onClick={() => setPgNum(1)}
+        >{`<<`}</button>
+        <button
+          disabled={pgNum === 1}
+          onClick={() => setPgNum(pgNum - 1)}
+        >{`<`}</button>
+        {[...Array(pages)].map((p, i) => {
           const page = i + 1;
-          return (
-            <button
-              disabled={pgNum === page}
-              key={i}
-              onClick={() => setPgNum(page)}
-            >
-              {page}
-            </button>
-          );
+          const twoAbove = page >= pgNum && page <= pgNum + 2;
+          const twoBelow = page <= pgNum && page >= pgNum - 2;
+          if (twoAbove || twoBelow) {
+            return (
+              <button
+                disabled={pgNum === page}
+                key={i}
+                onClick={() => setPgNum(page)}
+              >
+                {page}
+              </button>
+            );
+          }
         })}
+        <button
+          disabled={pgNum === pages}
+          onClick={() => setPgNum(pgNum + 1)}
+        >{`>`}</button>
+        <button
+          disabled={pgNum === pages}
+          onClick={() => setPgNum(pages)}
+        >{`>>`}</button>
       </div>
 
       {/* pagination (num per page) */}
