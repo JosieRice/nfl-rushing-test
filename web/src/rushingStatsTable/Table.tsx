@@ -1,5 +1,11 @@
 import { stripTypenames } from "../utils/utils";
 import { cleanHeaderNames } from "./data";
+import {
+  Table as StyledTable,
+  TableData,
+  TableHead,
+  TableRow,
+} from "./Table.style";
 
 interface Props {
   numPerPg: 10 | 25 | 50;
@@ -30,26 +36,39 @@ const Table = ({
 
   return (
     <>
-      <table>
+      <StyledTable>
+        <caption>Football players' rushing statistics</caption>
         <thead>
           <tr>
             {Object.keys(sanitizedData[0]).map((value) => {
-              return <th key={value}>{cleanHeaderNames[value] ?? value}</th>;
+              return (
+                <TableHead scope="row" key={value}>
+                  {cleanHeaderNames[value] ?? value}
+                </TableHead>
+              );
             })}
           </tr>
         </thead>
         <tbody>
           {sanitizedData.map((row: string | number, i: number) => {
             return (
-              <tr key={i}>
+              <TableRow key={i}>
                 {Object.values(row).map((value, i) => {
-                  return <td key={i}>{value}</td>;
+                  return <TableData key={i}>{value}</TableData>;
                 })}
-              </tr>
+              </TableRow>
             );
           })}
         </tbody>
-      </table>
+        <tfoot>
+          <tr>
+            <th scope="row" colSpan={2}>
+              Total Results
+            </th>
+            <td colSpan={2}>{totalCount}</td>
+          </tr>
+        </tfoot>
+      </StyledTable>
 
       {/* pagination (pages) */}
       <div>
@@ -97,9 +116,6 @@ const Table = ({
       <button disabled={numPerPg === 50} onClick={() => setNumPerPg(50)}>
         50
       </button>
-
-      {/* table metadata */}
-      <div>Total Results: {totalCount}</div>
     </>
   );
 };
