@@ -1,3 +1,8 @@
+// TODO: loading state
+// TODO: errory state
+// TODO: icons for sorts
+// TODO: pagination buttons style
+// TODO: results per pag buttons style
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
 import { RUSHING_STATS } from "./queries";
@@ -7,9 +12,11 @@ const Index = () => {
   const [numPerPg, setNumPerPg] = useState<10 | 25 | 50>(10);
   const [pgNum, setPgNum] = useState(1);
   const [playerFilter, setPlayerFilter] = useState("");
+  const [sortBy, setSortBy] = useState<string | null>(null);
+  const [orderBy, setOrderBy] = useState<"asc" | "desc" | null>(null);
 
   const { loading, error, data } = useQuery(RUSHING_STATS, {
-    variables: { pgNum, numPerPg, filter: playerFilter },
+    variables: { pgNum, numPerPg, filter: playerFilter, sortBy, orderBy },
   });
 
   /**
@@ -21,6 +28,8 @@ const Index = () => {
     setPgNum(1);
   }, [numPerPg, playerFilter]);
 
+  const sortableColumns = ["yds", "longest", "touchDown"];
+
   return (
     <>
       <input
@@ -31,9 +40,14 @@ const Index = () => {
       />
       <Table
         numPerPg={numPerPg}
+        orderBy={orderBy}
         pgNum={pgNum}
         setNumPerPg={setNumPerPg}
+        setOrderBy={setOrderBy}
         setPgNum={setPgNum}
+        setSortBy={setSortBy}
+        sortableColumns={sortableColumns}
+        sortBy={sortBy}
         tableData={data?.rushingStats}
         totalCount={data?.totalCount}
       />

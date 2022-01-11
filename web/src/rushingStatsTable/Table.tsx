@@ -1,3 +1,4 @@
+import { Dispatch, SetStateAction } from "react";
 import { stripTypenames } from "../utils/utils";
 import { cleanHeaderNames } from "./data";
 import {
@@ -9,18 +10,28 @@ import {
 
 interface Props {
   numPerPg: 10 | 25 | 50;
+  orderBy: "asc" | "desc" | null;
   pgNum: number;
-  setNumPerPg: (arg0: 10 | 25 | 50) => void;
-  setPgNum: (arg0: number) => void;
+  setNumPerPg: Dispatch<SetStateAction<10 | 25 | 50>>;
+  setOrderBy: Dispatch<SetStateAction<"asc" | "desc" | null>>;
+  setPgNum: Dispatch<SetStateAction<number>>;
+  setSortBy: Dispatch<SetStateAction<string | null>>;
+  sortableColumns?: string[];
+  sortBy: string | null;
   tableData: Record<string, number | string>[];
   totalCount: number;
 }
 
 const Table = ({
   numPerPg,
+  orderBy,
   pgNum,
   setNumPerPg,
+  setOrderBy,
   setPgNum,
+  setSortBy,
+  sortableColumns,
+  sortBy,
   tableData,
   totalCount,
 }: Props) => {
@@ -34,6 +45,49 @@ const Table = ({
   /** pagination stuff */
   const pages = Math.ceil(totalCount / numPerPg);
 
+  const handleSort = (value: string) => {
+    if (value !== sortBy) {
+      setSortBy(value);
+      setOrderBy("asc");
+    } else if (value === sortBy && (orderBy === null || orderBy === "desc")) {
+      setOrderBy("asc");
+    } else if (value === sortBy && orderBy === "asc") {
+      setOrderBy("desc");
+    }
+  };
+
+  const handleCSVDownload = () => {
+    const csvData = [
+      Object.keys(sanitizedData[0]).map((key) => {
+        return cleanHeaderNames[key];
+      }),
+      ...sanitizedData.map((item: Record<string, number | string>) => [
+        item.player,
+        item.team,
+        item.pos,
+        item.att,
+        item.attPerGame,
+        item.yds,
+        item.avg,
+        item.ydsPerGame,
+        item.touchDown,
+        item.longest,
+        item.first,
+        item.firstPercent,
+        item.twentyPlus,
+        item.fourtyPlus,
+        item.fumble,
+      ]),
+    ];
+
+    let csvContent =
+      "data:text/csv;charset=utf-8," +
+      csvData.map((e) => e.join(",")).join("\n");
+
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri, "Download");
+  };
+
   return (
     <>
       <StyledTable>
@@ -41,9 +95,21 @@ const Table = ({
         <thead>
           <tr>
             {Object.keys(sanitizedData[0]).map((value) => {
+              const sortable = sortableColumns?.includes(value);
+
+              const sortAsc = value === sortBy && orderBy === "asc";
+              const sortDesc = value === sortBy && orderBy === "desc";
+              const sortNone = value !== sortBy;
               return (
                 <TableHead scope="row" key={value}>
                   {cleanHeaderNames[value] ?? value}
+                  {sortable && (
+                    <button onClick={() => handleSort(value)}>
+                      {(sortNone && `up/down`) ||
+                        (sortAsc && `down`) ||
+                        (sortDesc && `up`)}
+                    </button>
+                  )}
                 </TableHead>
               );
             })}
@@ -107,15 +173,18 @@ const Table = ({
       </div>
 
       {/* pagination (num per page) */}
-      <button disabled={numPerPg === 10} onClick={() => setNumPerPg(10)}>
-        10
-      </button>
-      <button disabled={numPerPg === 25} onClick={() => setNumPerPg(25)}>
-        25
-      </button>
-      <button disabled={numPerPg === 50} onClick={() => setNumPerPg(50)}>
-        50
-      </button>
+      <div>
+        <button disabled={numPerPg === 10} onClick={() => setNumPerPg(10)}>
+          10
+        </button>
+        <button disabled={numPerPg === 25} onClick={() => setNumPerPg(25)}>
+          25
+        </button>
+        <button disabled={numPerPg === 50} onClick={() => setNumPerPg(50)}>
+          50
+        </button>
+      </div>
+      <button onClick={handleCSVDownload}>download as csv</button>
     </>
   );
 };

@@ -5,6 +5,7 @@ const { buildSchema } = require("graphql");
 const rushingStats = require("./rushing.json");
 const cors = require("cors");
 
+/** TODO: figure out how to use these enum type definition in the query params on the client side */
 const schema = buildSchema(`
   enum SortBy {
     yds
@@ -41,8 +42,8 @@ const schema = buildSchema(`
       numPerPg: Int!
       pgNum: Int!
       filter: String
-      sortBy: SortBy
-      orderBy: OrderBy
+      sortBy: String
+      orderBy: String
     ): [RushingStats]
   }
 `);
